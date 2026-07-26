@@ -1,13 +1,35 @@
-console.log("Current API URL:", import.meta.env.VITE_LOCAL_API_URL);
+// Determine API URL with smart fallback
+const NGROK_FALLBACK_URL = "https://retail-pranker-landless.ngrok-free.dev";
 
-export async function generateSceneClip(prompt) {
-  const apiUrl = import.meta.env.VITE_LOCAL_API_URL;
-  if (!apiUrl) {
-    throw new Error("VITE_LOCAL_API_URL is not defined in environment variables.");
+function getApiUrl() {
+  const envUrl = import.meta.env.VITE_LOCAL_API_URL;
+  const isProduction = window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+
+  // If running on a deployed site (Vercel etc.) and env var is missing or points to localhost, use ngrok
+  if (isProduction && (!envUrl || envUrl.includes("localhost") || envUrl.includes("127.0.0.1"))) {
+    console.warn("Production detected but API URL is local/missing. Using ngrok fallback:", NGROK_FALLBACK_URL);
+    return NGROK_FALLBACK_URL;
   }
 
+  // Otherwise use the env var (for local dev)
+  if (envUrl) {
+    return envUrl;
+  }
+
+  // Last resort fallback
+  console.warn("No API URL configured, using ngrok fallback:", NGROK_FALLBACK_URL);
+  return NGROK_FALLBACK_URL;
+}
+
+const API_URL = getApiUrl();
+console.log("PromptVerse API URL resolved to:", API_URL);
+console.log("Running on:", window.location.hostname);
+
+export async function generateSceneClip(prompt) {
+  console.log("generateSceneClip: Sending request to", `${API_URL}/generate-scene`);
+
   try {
-    const response = await fetch(`${apiUrl}/generate-scene`, {
+    const response = await fetch(`${API_URL}/generate-scene`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,13 +51,10 @@ export async function generateSceneClip(prompt) {
 }
 
 export async function stitchVideoClips(clipIds) {
-  const apiUrl = import.meta.env.VITE_LOCAL_API_URL;
-  if (!apiUrl) {
-    throw new Error("VITE_LOCAL_API_URL is not defined in environment variables.");
-  }
+  console.log("stitchVideoClips: Sending request to", `${API_URL}/stitch-video`);
 
   try {
-    const response = await fetch(`${apiUrl}/stitch-video`, {
+    const response = await fetch(`${API_URL}/stitch-video`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,3 +75,4 @@ export async function stitchVideoClips(clipIds) {
     throw error;
   }
 }
+
