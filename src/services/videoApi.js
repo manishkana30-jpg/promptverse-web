@@ -1,5 +1,5 @@
 // Determine API URL with smart fallback
-const NGROK_FALLBACK_URL = "https://retail-pranker-landless.ngrok-free.dev";
+const TUNNEL_FALLBACK_URL = "https://bikes-discuss-boutique-stake.trycloudflare.com";
 
 function getApiUrl() {
   const envUrl = import.meta.env.VITE_LOCAL_API_URL;
@@ -7,8 +7,8 @@ function getApiUrl() {
 
   // If running on a deployed site (Vercel etc.) and env var is missing or points to localhost, use ngrok
   if (isProduction && (!envUrl || envUrl.includes("localhost") || envUrl.includes("127.0.0.1"))) {
-    console.warn("Production detected but API URL is local/missing. Using ngrok fallback:", NGROK_FALLBACK_URL);
-    return NGROK_FALLBACK_URL;
+    console.warn("Production detected but API URL is local/missing. Using ngrok fallback:", TUNNEL_FALLBACK_URL);
+    return TUNNEL_FALLBACK_URL;
   }
 
   // Otherwise use the env var (for local dev)
@@ -17,8 +17,8 @@ function getApiUrl() {
   }
 
   // Last resort fallback
-  console.warn("No API URL configured, using ngrok fallback:", NGROK_FALLBACK_URL);
-  return NGROK_FALLBACK_URL;
+  console.warn("No API URL configured, using ngrok fallback:", TUNNEL_FALLBACK_URL);
+  return TUNNEL_FALLBACK_URL;
 }
 
 const API_URL = getApiUrl();
